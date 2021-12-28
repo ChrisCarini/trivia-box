@@ -76,18 +76,16 @@ def update_gist(title: str, content: str) -> None:
     access_token = os.environ[ENV_VAR_GITHUB_TOKEN]
     gist_id = os.environ[ENV_VAR_GIST_ID]
     gist = Github(access_token).get_gist(gist_id)
-    # Works only for single file. Should we clear all files and create new file?
-    old_title = list(gist.files.keys())[0]
-    gist.edit(
-        description=title,
-        files={
-            old_title: InputFileContent(content=content, new_name=title),
-            'INFO.md': InputFileContent(
-                content=f"_🔗 [See the source code behind this gist here!]({REPO_URL})_",
-                new_name=f'{title} - INFO.md'
-            ),
-        }
+    # First, we clear all the contents of any / all the existing files in the Gist.
+    files = {filename: None for filename in list(gist.files.keys())}
+    # Then, we add our new file + 'INFO.md' w/ the respective content to the Gist.
+    files[title] = InputFileContent(content=content, new_name=title)
+    files[f'{title} - INFO.md'] = InputFileContent(
+        content=f"_🔗 [See the source code behind this gist here!]({REPO_URL})_",
+        new_name=f'{title} - INFO.md'
     )
+    # Finally, update the gist.
+    gist.edit(description=title, files=files)
 
 
 def main():
