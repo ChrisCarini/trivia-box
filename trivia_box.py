@@ -2,19 +2,29 @@ import html
 import os
 import random
 import textwrap
-from datetime import date
-from typing import Any, Dict, NewType, Tuple, List, Union
+
+from typing import Any, Dict, List, NewType, Optional, Tuple, TypedDict
 from urllib.parse import unquote
 
 import requests
+
 from github import Github
 from github.InputFileContent import InputFileContent
 
-RequestsData = NewType("RequestsData", Dict[str, Any])
-Question = NewType("Question", Dict[str, Union[str, List[str]]])
+RequestsData = NewType('RequestsData', Dict[str, Any])
 
-ENV_VAR_GIST_ID = "GIST_ID"
-ENV_VAR_GITHUB_TOKEN = "GH_TOKEN"
+
+class Question(TypedDict):
+    category: str
+    type: str
+    difficulty: str
+    question: str
+    correct_answer: str
+    incorrect_answers: List[str]
+
+
+ENV_VAR_GIST_ID = 'GIST_ID'
+ENV_VAR_GITHUB_TOKEN = 'GH_TOKEN'
 REPO_URL = 'https://github.com/ChrisCarini/trivia-box'
 MAX_LINE_LENGTH = 53
 # ANSWER_KEYS = ['A', 'B', 'C', 'D']
@@ -25,8 +35,13 @@ def escape(text: str) -> str:
     return unquote(html.unescape(text))
 
 
+def build_url(category: int, quantity: int) -> str:
+    return f'https://opentdb.com/api.php?amount={quantity}&category={category}'
+
+
 def get_trivia_questions(category: int = 18, quantity: int = 10) -> RequestsData:
-    resp = requests.get(f'https://opentdb.com/api.php?amount={quantity}&category={category}')
+    url = build_url(category=category, quantity=quantity)
+    resp = requests.get(url=url)
     return resp.json()
 
 
@@ -51,8 +66,8 @@ def pick_question(short_questions: List[Question], long_questions: List[Question
 
 
 def format_question(question: Question) -> str:
-    correct_answer = question['correct_answer']
-    incorrect_answers = question['incorrect_answers']
+    correct_answer: str = question['correct_answer']
+    incorrect_answers: List[str] = question['incorrect_answers']
     all_answers = [correct_answer] + incorrect_answers
     question_text = f'❓ {question["question"]}'
     result = [escape(text) for text in textwrap.wrap(question_text, MAX_LINE_LENGTH)]
@@ -61,9 +76,9 @@ def format_question(question: Question) -> str:
     random.shuffle(all_answers)
 
     # Add answers to result
-    for idx, answer in enumerate(all_answers):
+    for idx, answer in enumerate(all_answers):  # type: int, str
         result.append(f'{ANSWER_KEYS[idx]} {escape(answer)}')
-    return "\n".join(result)
+    return '\n'.join(result)
 
 
 def update_gist(title: str, content: str) -> None:
@@ -72,41 +87,17 @@ def update_gist(title: str, content: str) -> None:
     Use gist id and github token present in environment variables.
     Replace first file in the gist.
     """
-    print(f"{title}\n{content}")
+    print(f'{title}\n{content}')
     access_token = os.environ[ENV_VAR_GITHUB_TOKEN]
     gist_id = os.environ[ENV_VAR_GIST_ID]
     gist = Github(access_token).get_gist(gist_id)
     # First, we clear all the contents of any / all the existing files in the Gist.
-    files = {filename: None for filename in list(gist.files.keys())}
+    files: Dict[str, Optional[InputFileContent]] = {filename: None for filename in list(gist.files.keys())}
     # Then, we add our new file + 'INFO.md' w/ the respective content to the Gist.
     files[title] = InputFileContent(content=content, new_name=title)
     files[f'{title} - INFO.md'] = InputFileContent(
-        content=f"_🔗 [See the source code behind this gist here!]({REPO_URL})_",
-        new_name=f'{title} - INFO.md'
+        content=f'_🔗 [See the source code behind this gist here!]({REPO_URL})_',
+        new_name=f'{title} - INFO.md',
     )
     # Finally, update the gist.
     gist.edit(description=title, files=files)
-
-
-def main():
-    data = get_trivia_questions()
-
-    short, long = filter_questions(data)
-
-    question = pick_question(short, long)
-
-    formatted_output = format_question(question)
-
-    update_gist(
-        title=f'Trivia of the Day - {date.today().isoformat()}',
-        content=formatted_output
-    )
-
-
-if __name__ == "__main__":
-    import time
-
-    s = time.perf_counter()
-    main()
-    elapsed = time.perf_counter() - s
-    print(f"{__file__} executed in {elapsed:0.2f} seconds.")

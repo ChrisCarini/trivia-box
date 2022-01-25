@@ -4,6 +4,7 @@
   <p align="center">💻 Update a gist to contain a daily trivia question from Open Trivia DB</p>
   <p align="center">
     <img src="https://github.com/ChrisCarini/trivia-box/workflows/Update%20gist%20with%20daily%20trivia/badge.svg?branch=main" alt="Update a gist to contain a daily trivia question from Open Trivia DB">
+    <img src="https://github.com/ChrisCarini/trivia-box/workflows/Linting%20%26%20Test/badge.svg?branch=main" alt="Lint & Test">
   </p>
 </p>
 
@@ -28,9 +29,27 @@
 
 ## 🤓 Hacking
 
-```bash
-# setup
+### Getting Setup
+
+```shell
 python3 -m venv venv
-source venv/bin/activate
+source activate
 pip install -r requirements.txt
+```
+
+### Saving Dependencies
+
+```shell
+source activate
+pip-chill > requirements.txt
+```
+
+### Running linting and tests
+
+```shell
+isort main.py trivia_box.py test/ && \
+mypy main.py trivia_box.py test/ && \
+flake8 main.py trivia_box.py test/ && \
+blue --check main.py trivia_box.py test/ && \
+pytest test/
 ```
