@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Update gist
-        run: python trivia_box.py
+        run: python main.py
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GIST_ID: 'ef9d16e87e0458fff84bf42c4e05894b'
