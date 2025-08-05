@@ -122,9 +122,9 @@ def test_pick_question():
     )
 
     # then
-    assert (
-        result in short_questions
-    ), "If short questions exist, we expect the result to be picked from there."
+    assert result in short_questions, (
+        "If short questions exist, we expect the result to be picked from there."
+    )
 
     # given
     short_questions = []
@@ -136,9 +136,9 @@ def test_pick_question():
     )
 
     # then
-    assert (
-        result in long_questions
-    ), "If no short questions exist, we expect the result to be a long question."
+    assert result in long_questions, (
+        "If no short questions exist, we expect the result to be a long question."
+    )
 
 
 def test_format_question():

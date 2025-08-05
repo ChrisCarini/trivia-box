@@ -71,7 +71,7 @@ def format_question(question: Question) -> str:
     correct_answer: str = question["correct_answer"]
     incorrect_answers: List[str] = question["incorrect_answers"]
     all_answers = [correct_answer] + incorrect_answers
-    question_text = f'❓ {question["question"]}'
+    question_text = f"❓ {question['question']}"
     result = [escape(text) for text in textwrap.wrap(question_text, MAX_LINE_LENGTH)]
 
     # Shuffle the answers
