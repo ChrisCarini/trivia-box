@@ -48,7 +48,7 @@ def filter_questions(data: RequestsData) -> tuple[list[Question], list[Question]
     long_questions = []
     for question in data["results"]:
         question_text = escape(question["question"])
-        if len(question_text) <= MAX_LINE_LENGTH or len(question_text) > MAX_LINE_LENGTH and question["type"] == "boolean":
+        if len(question_text) <= MAX_LINE_LENGTH or question["type"] == "boolean":
             short_questions.append(question)
         else:
             long_questions.append(question)
