@@ -1,10 +1,8 @@
 import os
-
 from unittest import mock
 from unittest.mock import MagicMock, PropertyMock
 
 import trivia_box
-
 from trivia_box import (
     Question,
     build_url,
