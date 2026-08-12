@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime, timezone
 
 from trivia_box import (
     filter_questions,
@@ -19,7 +19,7 @@ def main():
     formatted_output = format_question(question)
 
     update_gist(
-        title=f"Trivia of the Day - {date.today().isoformat()}",
+        title=f"Trivia of the Day - {datetime.now(tz=timezone.utc).date().isoformat()}",
         content=formatted_output,
     )
 

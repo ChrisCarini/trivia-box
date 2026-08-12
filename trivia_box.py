@@ -2,16 +2,14 @@ import html
 import os
 import random
 import textwrap
-
-from typing import Any, Dict, List, NewType, Optional, Tuple, TypedDict
+from typing import Any, NewType, TypedDict
 from urllib.parse import unquote
 
 import requests
-
 from github import Github
 from github.InputFileContent import InputFileContent
 
-RequestsData = NewType("RequestsData", Dict[str, Any])
+RequestsData = NewType("RequestsData", dict[str, Any])
 
 
 class Question(TypedDict):
@@ -20,7 +18,7 @@ class Question(TypedDict):
     difficulty: str
     question: str
     correct_answer: str
-    incorrect_answers: List[str]
+    incorrect_answers: list[str]
 
 
 ENV_VAR_GIST_ID = "GIST_ID"
@@ -45,14 +43,12 @@ def get_trivia_questions(category: int = 18, quantity: int = 10) -> RequestsData
     return resp.json()
 
 
-def filter_questions(data: RequestsData) -> Tuple[List[Question], List[Question]]:
+def filter_questions(data: RequestsData) -> tuple[list[Question], list[Question]]:
     short_questions = []
     long_questions = []
     for question in data["results"]:
         question_text = escape(question["question"])
-        if len(question_text) <= MAX_LINE_LENGTH:
-            short_questions.append(question)
-        elif len(question_text) > MAX_LINE_LENGTH and question["type"] == "boolean":
+        if len(question_text) <= MAX_LINE_LENGTH or question["type"] == "boolean":
             short_questions.append(question)
         else:
             long_questions.append(question)
@@ -60,7 +56,7 @@ def filter_questions(data: RequestsData) -> Tuple[List[Question], List[Question]
 
 
 def pick_question(
-    short_questions: List[Question], long_questions: List[Question]
+    short_questions: list[Question], long_questions: list[Question]
 ) -> Question:
     if len(short_questions) > 0:
         return random.choice(short_questions)
@@ -69,7 +65,7 @@ def pick_question(
 
 def format_question(question: Question) -> str:
     correct_answer: str = question["correct_answer"]
-    incorrect_answers: List[str] = question["incorrect_answers"]
+    incorrect_answers: list[str] = question["incorrect_answers"]
     all_answers = [correct_answer] + incorrect_answers
     question_text = f"❓ {question['question']}"
     result = [escape(text) for text in textwrap.wrap(question_text, MAX_LINE_LENGTH)]
@@ -94,7 +90,7 @@ def update_gist(title: str, content: str) -> None:
     gist_id = os.environ[ENV_VAR_GIST_ID]
     gist = Github(access_token).get_gist(gist_id)
     # First, we clear all the contents of any / all the existing files in the Gist.
-    files: Dict[str, Optional[InputFileContent]] = {
+    files: dict[str, InputFileContent | None] = {
         filename: None for filename in list(gist.files.keys())
     }
     # Then, we add our new file + 'INFO.md' w/ the respective content to the Gist.
