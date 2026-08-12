@@ -3,8 +3,8 @@
   <h1 align="center">trivia-box</h1>
   <p align="center">💻 Update a gist to contain a daily trivia question from Open Trivia DB</p>
   <p align="center">
-    <img src="https://github.com/ChrisCarini/trivia-box/workflows/Update%20gist%20with%20daily%20trivia/badge.svg?branch=main" alt="Update a gist to contain a daily trivia question from Open Trivia DB">
-    <img src="https://github.com/ChrisCarini/trivia-box/workflows/Linting%20%26%20Test/badge.svg?branch=main" alt="Lint & Test">
+    <img src="https://github.com/ChrisCarini/trivia-box/actions/workflows/trivia.yaml/badge.svg?branch=main" alt="Update a gist to contain a daily trivia question from Open Trivia DB">
+    <img src="https://github.com/ChrisCarini/trivia-box/actions/workflows/lint_and_test.yml/badge.svg?branch=main" alt="Lint & Test">
   </p>
 </p>
 
